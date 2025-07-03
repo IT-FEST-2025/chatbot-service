@@ -20,3 +20,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Deploy to VPS
+        run: |
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /home/${{ secrets.VPS_USERNAME }}/apps/chatbot-service
+            git pull origin main
+            pm2 restart all
+          EOF
+        
+        
