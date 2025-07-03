@@ -20,13 +20,19 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
+      
       - name: Deploy to VPS
-        run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
-            cd /home/${{ secrets.VPS_USERNAME }}/apps/chatbot-service
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          script: |
+            node -v
+            cd /home/diagnify/apps/chatbot-service
             git pull origin main
-            pm2 restart all
-          EOF
+            npm ci
+            pm2 restart chatbot-service
+        
         
         
