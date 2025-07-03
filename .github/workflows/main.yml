@@ -20,7 +20,8 @@ jobs:
       - name: Pull latest changes on VPS
         run: |
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            pm2_path="/home/${{ secrets.VPS_USERNAME }}/.nvm/versions/node/v22.17.0/bin/pm2"
             cd /home/${{ secrets.VPS_USERNAME }}/apps/chatbot-service
             git pull origin main
-            pm2 restart chatbot-service || pm2 start chatbot-service --name chatbot-service
+            $pm2_path restart chatbot-service || $pm2_path start chatbot-service --name chatbot-service
           EOF
