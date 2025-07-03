@@ -1,4 +1,4 @@
-name: Push git
+name: Deploy to VPS
 
 on:
   push:
@@ -6,33 +6,21 @@ on:
       - main
 
 jobs:
-  keren:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Deploy to VPS
-        uses: appleboy/scp-action@v1.0.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_KEY }}
-          script: |
-            node -v
-            cd /home/diagnify/apps/chatbot-service
+      - name: Pull latest changes on VPS
+        run: |
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /home/${{ secrets.VPS_USERNAME }}/apps/chatbot-service
             git pull origin main
-            npm ci
-            pm2 restart chatbot-service
-        
-        
-        
+            pm2 restart chatbot-service || pm2 start chatbot-service --name chatbot-service
+          EOF
