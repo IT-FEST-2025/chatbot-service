@@ -10,18 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Pull latest changes on VPS
-        run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
-            pm2_path="/home/${{ secrets.VPS_USERNAME }}/.nvm/versions/node/v22.17.0/bin/pm2"
-            cd /home/${{ secrets.VPS_USERNAME }}/apps/chatbot-service
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          script: |
+            cd /home/diagnify/apps/chatbot-service
             git pull origin main
-            $pm2_path restart chatbot-service || $pm2_path start chatbot-service --name chatbot-service
-          EOF
+            docker compose down
+            docker compose up -d --build
