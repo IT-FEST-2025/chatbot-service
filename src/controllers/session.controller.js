@@ -3,7 +3,7 @@ import sessionService from "../services/session.service.js";
 
 const createSession = async (req, res) => {
   try {
-    const { id } = req.user.id;
+    const { id } = req.user;
     const data = { userId: id };
 
     logger.info("[session.controller] create new session", { data });
