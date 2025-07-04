@@ -10,7 +10,7 @@ const createSession = async (req, res) => {
     const session = await sessionService.create(data);
 
     res.status(201).json({
-      message: `session (userId: ${1}) created successfuly`,
+      message: `session (userId: ${id}) created successfuly`,
       data: session,
     });
   } catch (error) {
