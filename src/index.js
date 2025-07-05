@@ -11,7 +11,9 @@ dotenv.config();
 const app = express();
 connectDB();
 
-app.use(cors());
+app.use(cors({
+  origin: ["https://ayuwoki.my.id", "http://localhost:5173"],
+}));
 app.use(express.json());
 
 app.get("/", (req, res) => {
