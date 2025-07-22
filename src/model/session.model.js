@@ -7,7 +7,7 @@ const SessionSchema = new mongoose.Schema({
   },
   title: {
     type: String,
-    default: "Session Title",
+    default: "Percakapan Baru",
   },
   createdAt: {
     type: Date,
